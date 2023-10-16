@@ -1,3 +1,4 @@
+import { notFound } from "next/navigation";
 import { Article } from "./types";
 
 export const getAllArticles = async (): Promise<Article[]> => {
@@ -13,4 +14,25 @@ export const getAllArticles = async (): Promise<Article[]> => {
     // シリアライズ
     const articles = await res.json();
     return articles;
+};
+
+export const getDetailArticle = async (id:string): Promise<Article> => {
+    const res = await fetch(`http://localhost:3001/posts/${id}`, {
+        next: {revalidate:60 },
+    }); //SSR
+
+    if(res.status === 404){
+        notFound();
+    }
+
+    if (!res.ok) {
+    throw new Error("エラーが発生しました。");
+    }
+
+    // Loading処理シミュレーション
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    // シリアライズ
+    const article = await res.json();
+    return article;
 };
